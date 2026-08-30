@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IDRARIUM-ANARCHY • VIP</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at top,#450000,#090909 58%);color:#fff;min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{width:min(900px,100%);background:#111;border:1px solid #3b1111;border-radius:22px;padding:30px;box-shadow:0 20px 60px #000}
+h1{margin:0 0 6px;font-size:36px}.red{color:#ff2c2c}.muted{color:#aaa}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}.box{background:#171717;border-radius:16px;padding:20px}
+input,button{width:100%;padding:14px;border-radius:10px;font-size:16px}input{border:1px solid #444;background:#0d0d0d;color:#fff}button{margin-top:10px;background:#b40000;border:1px solid #e00000;color:white;font-weight:bold;cursor:pointer}
+.num{font-size:38px;font-weight:bold;margin:10px 0}.track{height:16px;background:#2b2b2b;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:#e00000;transition:.25s}
+#offerwall{margin-top:18px;min-height:420px;border-radius:16px;background:#0c0c0c;border:1px solid #2b2b2b;padding:24px}
+@media(max-width:700px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>⚔ <span class="red">IDRARIUM-ANARCHY</span></h1>
+<p class="muted">5 récompenses validées = VIP pendant 24 heures.</p>
+
+<div class="row">
+<section class="box">
+<label>Pseudo Minecraft</label>
+<input id="username" maxlength="40" placeholder="TonPseudo">
+<button onclick="loadProgress()">Afficher ma progression</button>
+<p id="msg" class="muted"></p>
+</section>
+<section class="box">
+<strong>Progression</strong>
+<div class="num"><span id="count">0</span>/5</div>
+<div class="track"><div id="bar" class="bar"></div></div>
+<p class="muted">La progression augmente uniquement après confirmation du fournisseur de récompense.</p>
+</section>
+</div>
+
+<section id="offerwall">
+<h2>📺 Pubs / offres</h2>
+<p class="muted">Remplace le bloc ci-dessous par ton offerwall Lootably après avoir obtenu ton Placement ID.</p>
+<div style="border:1px dashed #555;border-radius:12px;padding:25px;text-align:center">
+<strong>OFFERWALL À CONFIGURER</strong><br><br>
+<span class="muted">Le backend est déjà prêt à recevoir le postback.</span>
+</div>
+</section>
+</main>
+
+<script>
+const BACKEND_URL="https://TON-BACKEND.onrender.com";
+const u=document.getElementById("username");
+const count=document.getElementById("count");
+const bar=document.getElementById("bar");
+const msg=document.getElementById("msg");
+
+async function loadProgress(){
+  const user=u.value.trim();
+  if(!/^[A-Za-z0-9_.-]{1,40}$/.test(user)){msg.textContent="Pseudo invalide.";return;}
+  try{
+    const r=await fetch(`${BACKEND_URL}/api/progress/${encodeURIComponent(user)}`);
+    const d=await r.json();
+    count.textContent=d.progress;
+    bar.style.width=(d.progress/5*100)+"%";
+    msg.textContent="Pseudo enregistré.";
+  }catch(e){msg.textContent="Backend inaccessible. Vérifie BACKEND_URL.";}
+}
+setInterval(()=>{ if(u.value.trim()) loadProgress(); },10000);
+</script>
+</body>
+</html>
